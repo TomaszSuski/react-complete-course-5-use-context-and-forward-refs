@@ -1,34 +1,42 @@
-import React from "react";
+import React, { useImperativeHandle, useRef } from "react";
 import PropTypes from "prop-types";
 import classes from "./Input.module.css";
 
-export default function Input({
-  className,
-  isValid,
-  label,
-  type,
-  id,
-  value,
-  onChange,
-  onBlur,
-}) {
-  return (
-    <div
-      className={`${classes.control} ${
-        isValid === false ? classes.invalid : ""
-      }`}
-    >
-      <label htmlFor={id}>{label}</label>
-      <input
-        type={type}
-        id={id}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-      />
-    </div>
-  );
-}
+const Input = React.forwardRef(
+  ({ className, isValid, label, type, id, value, onChange, onBlur }, ref) => {
+    const inputRef = useRef();
+
+    useImperativeHandle(ref, () => {
+      return {
+        focus: activate,
+      };
+    });
+
+    const activate = () => {
+      inputRef.current.focus();
+    };
+
+    return (
+      <div
+        className={`${classes.control} ${
+          isValid === false ? classes.invalid : ""
+        } ${className}`}
+      >
+        <label htmlFor={id}>{label}</label>
+        <input
+          ref={inputRef}
+          type={type}
+          id={id}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+        />
+      </div>
+    );
+  }
+);
+
+export default Input;
 
 Input.propTypes = {
   className: PropTypes.string,
